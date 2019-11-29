@@ -1,2 +1,2 @@
-# ta-racing-telemetry
-Splunk Racing Telemetry technical add on
+# ta-torque
+Torque technical add on for Splunk
