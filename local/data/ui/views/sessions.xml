@@ -1,0 +1,387 @@
+<form theme="dark">
+  <label>Previous Sessions</label>
+  <init>
+    <set token="speedunit">KM/h</set>
+  </init>
+  <fieldset submitButton="false">
+    <input type="text" token="span">
+      <label>Span (ms)</label>
+      <default>1s</default>
+    </input>
+    <input type="radio" token="speed" searchWhenChanged="true">
+      <label>Speed Units</label>
+      <choice value="3.6">Km/h</choice>
+      <choice value="2.2369">Mi/h</choice>
+      <default>3.6</default>
+      <initialValue>3.6</initialValue>
+      <change>
+        <set token="speedunit">$label$</set>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Sessions</title>
+      <input type="time" token="sessiontime" searchWhenChanged="true">
+        <label>Session Search</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>| mstats earliest(CarOrdinal) as CarOrdinal avg(Speed) as Speed WHERE `telemetry-index` span=1s 
+| where CarOrdinal!=0
+| transaction CarOrdinal maxspan=5m maxpause=1h
+| stats avg(Speed) as "AvgSpeed" by _time duration CarOrdinal
+| eval AvgSpeed = AvgSpeed*$speed$
+| eval end = _time+duration
+| eval duration = duration/60
+| lookup Forza-CarOrdinal.csv CarOrdinal OUTPUT Manufacturer Model
+| fields - CarOrdinal
+| sort -_time</query>
+          <earliest>$sessiontime.earliest$</earliest>
+          <latest>$sessiontime.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="number" field="duration">
+          <option name="precision">0</option>
+          <option name="unit">min</option>
+        </format>
+        <format type="number" field="AvgSpeed">
+          <option name="precision">1</option>
+          <option name="unit">$speedunit$</option>
+          <option name="useThousandSeparators">false</option>
+        </format>
+        <drilldown>
+          <set token="time.earliest">$row._time$</set>
+          <set token="time.latest">$row.end$</set>
+          <set token="session">true</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="session">
+      <table>
+        <title>Lap Drilldown</title>
+        <search>
+          <query>| mstats latest(LapNumber) as lap WHERE `telemetry-index` span=1s
+| transaction lap
+| table _time duration lap 
+| where lap!=0
+| eval end = _time+duration</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="time.earliest">$row._time$</set>
+          <set token="time.latest">$row.end$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| mstats latest(CarOrdinal) as CarOrdinal
+latest(CarClass) as CarClass
+latest(CarPerformanceIndex) as PerformanceIndex
+latest(DrivetrainType) as DrivetrainType
+latest(NumCylinders) as NumCylinders
+latest(DistanceTraveled) as DistanceTraveled
+WHERE `forzametricsindex`
+| lookup CarClass.csv CarClass
+| lookup DrivetrainType.csv DrivetrainType
+| lookup CarOrdinal.csv CarOrdinal
+| table Manufacturer Model Class PerformanceIndex NumCylinders Drivetrain DistanceTraveled</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Steering</title>
+        <search>
+          <query>| mstats latest(Steer) as Steer where `telemetry-index` span=1s 
+| eval Steer = Steer/1.27</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">-100</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.rangeValues">[-100,-90,-70,70,90,100]</option>
+        <option name="charting.chart.style">minimal</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.gaugeColors">["0xdc4e41","0xf1813f","0x53a051","0xf1813f","0xdc4e41"]</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Gear</title>
+        <search>
+          <query>| mstats latest(Gear) as Gear WHERE `forzametricsindex` span=1s</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Inputs</title>
+        <search>
+          <query>| mstats avg(Brake) as Brake avg(Accel) as Accel avg(HandBrake) as HandBrake WHERE `telemetry-index` span=1s
+| eval Brake=Brake/2.54
+| eval Accel=Accel/2.54
+| eval HandBrake=HandBrake/2.54</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"Solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Speed / RPM</title>
+        <search>
+          <query>| mstats avg(Speed) as Speed avg(EngineRpmCurrent) as EngineRpm WHERE `telemetry-index` span=1s
+| eval Speed = Speed*$speed$</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.overlayFields">Speed</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Peak Wheel Temp</title>
+        <search>
+          <query>| mstats max(TireTemp*) as * WHERE `telemetry-index` span=1s 
+| tail 999 
+| reverse</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x006d9c","0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">large</option>
+        <option name="trellis.splitBy">_aggregation</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unit">Â°C</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Peak Wheel Slip</title>
+        <search>
+          <query>| mstats max(TireCombinedSlip*) as * WHERE `telemetry-index` span=1s
+| tail 999 
+| reverse</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[5,33,66]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">large</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unit">%</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Peak Suspension</title>
+        <search>
+          <query>| mstats max(NormalizedSuspensionTravel*) as * WHERE `telemetry-index` span=1s
+| tail 999 
+| reverse</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0x006d9c","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[25,50,75]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">large</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unit">%</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Map</title>
+      <chart>
+        <search>
+          <query>| mstats max(Speed) as Speed latest(PositionX) as X latest(PositionZ) as Z WHERE `telemetry-index` span=1s 
+| where X!=0 OR Z!=0
+| eval Speed=Speed*$speed$
+| bin Speed start=0 bins=4
+| table Speed X Z</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">scatter</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="charting.seriesColors">[0x3bd100,0x98a000,0xbd6500,0xc40000]</option>
+        <option name="height">900</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+</form>

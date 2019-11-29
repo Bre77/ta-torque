@@ -1,0 +1,18 @@
+[app/ui]
+version = 8.0.0
+modtime = 1574234290.397922000
+
+[app/launcher]
+version = 8.0.0
+modtime = 1574234290.398708000
+
+[macros/telemetry-index]
+access = read : [ * ], write : [ admin, power ]
+export = none
+owner = brett
+version = 8.0.0
+modtime = 1574364780.569169000
+
+[inputs/torque%3A%2F%2Ftest]
+version = 8.0.0
+modtime = 1575007412.607434000
