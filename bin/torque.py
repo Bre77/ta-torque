@@ -151,7 +151,7 @@ def run_script():
                     host = self.client_address[0]
                     data = {}
                     dims = {}
-                    now = None
+                    now = time.time()
                     query = self.path[1:].split("&")
                     for kv in query:
                         k,v = kv.split("=")
