@@ -6,13 +6,6 @@ modtime = 1574234290.397922000
 version = 8.0.0
 modtime = 1574234290.398708000
 
-[macros/telemetry-index]
-access = read : [ * ], write : [ admin, power ]
-export = none
-owner = brett
-version = 8.0.0
-modtime = 1574364780.569169000
-
 [inputs/torque%3A%2F%2Ftest]
 version = 8.0.0
 modtime = 1575007412.607434000
@@ -24,3 +17,24 @@ modtime = 1575239648.455560000
 [inputs/torque%3A%2F%2Fpython2]
 version = 8.0.0
 modtime = 1575239651.508810000
+
+[views/overview]
+owner = brett
+version = 8.0.0
+modtime = 1575239783.297432000
+
+[macros/torque-index]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = brett
+version = 8.0.0
+modtime = 1575239919.068268000
+
+[views/torque_summary]
+owner = brett
+version = 8.0.0
+modtime = 1575240309.816582000
+
+[nav/default]
+version = 8.0.0
+modtime = 1575240341.484021000
