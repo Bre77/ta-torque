@@ -177,7 +177,7 @@ def run_script():
                             if session:
                                 sources[session] = v
                         elif k[:13] == "userShortName": #Add missing defintions
-                            ki = k[13:]
+                            ki = k[12:]
                             if ki not in pids:
                                 pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
                                 logging.info("Adding non standard PID {} = {}".format(ki,pids[ki]))
