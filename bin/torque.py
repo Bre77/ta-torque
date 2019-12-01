@@ -175,7 +175,7 @@ def run_script():
                             session = k
                             source = sources.get(k,"unknown")
                         elif k == "profileName": # Set source, and if possible relate it to a session
-                            dims["source"] = v
+                            source = v
                             if session:
                                 sources[session] = v
                         elif k[:13] == "userShortName": #Add missing defintions
