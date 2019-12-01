@@ -149,6 +149,7 @@ def run_script():
             try:
                 if(self.path[:1] == "?"):
                     session = None
+                    source = "unknown"
                     host = self.client_address[0]
                     data = {}
                     dims = {}
@@ -172,7 +173,7 @@ def run_script():
                             data["metric_name:net.latency"] = time.time()-now
                         elif k == "session": # Get Session, save as dim, and try get the related source
                             session = k
-                            dims["source"] = sources.get(k,"unknown")
+                            source = sources.get(k,"unknown")
                         elif k == "profileName": # Set source, and if possible relate it to a session
                             dims["source"] = v
                             if session:
