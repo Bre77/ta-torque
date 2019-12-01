@@ -155,12 +155,12 @@ def run_script():
                     dims = {}
                     now = time.time()
                     query = self.path[1:].split("&")
-                    for kv in query:
-                        k,v = kv.split("=")
+
+                    for kv in query: # Iterate through the query string
+                        k,v = kv.split("=") # Get the key and value
                         if k[:1] == "k":
-                            ki = int(k[1:],16)
-                            #do dict on id and add metric_name
-                            data["metric_name:car.{}".format(pids.get(ki,"pid"+hex(ki)[2:]))] = float(v)
+                            ki = int(k[1:],16) # Get the PID Hex as Integer
+                            data["metric_name:car.{}".format(pids.get(ki,hex(ki)))] = float(v) # Key as friendly name or Hex, and value as float
                         elif k == "eml":
                             if opt_email and v not in opt_email.split(","):
                                 logging.info(opt_email)
