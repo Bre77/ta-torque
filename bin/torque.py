@@ -194,9 +194,7 @@ def run_script():
                         
                         else: # Add the rest as dimensions
                             dims[k] = v
-                
-                    #"GET ?eml=brett.whynot@gmail.com&v=8&session=1574906194609&id=0f607264fc6318a92b9e13c65db7cd3c&time=1574906292241&kff1005=153.05600033&kff1006=-27.35587294&kff1001=0.0&kff1007=0.0&kff1239=11.583717&kff1010=51.9071044921875&kff123b=0.0&kff1006=-27.35587294&kff1005=153.05600033&kff1001=0.0
-                
+                    
                     if now and data:
                         if(opt_multimetric):
                             print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(now,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
