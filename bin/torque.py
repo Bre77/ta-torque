@@ -158,19 +158,23 @@ def run_script():
 
                     for kv in query: # Iterate through the query string
                         k,v = kv.split("=") # Get the key and value
-                        if k[:1] == "k":
-                            ki = int(k[1:],16) # Get the PID Hex as Integer
-                            data["metric_name:car.{}".format(pids.get(ki,hex(ki)))] = float(v) # Key as friendly name or Hex, and value as float
-                        elif k == "eml": 
-                            if opt_email and v not in opt_email.split(","): # Check email matches, like a password
+
+                        if k[:1] == "k": # Get the PID Hex as Integer, look up its name, and store it
+                            ki = int(k[1:],16)
+                            data["metric_name:car.{}".format(pids.get(ki,hex(ki)))] = float(v)
+
+                        elif k == "eml": # Check email matches, like a password
+                            if opt_email and v not in opt_email.split(","): 
                                 logging.debug("{}!=={}".format(opt_email,v))
                                 self._set_headers(400)
                                 self.wfile.write("BAD EMAIL ADDRESS".encode("utf8"))
                                 return
-                        elif k == "time":
-                            now = float(v)/1000.0 #ms to s as float
+
+                        elif k == "time": # Get event time as seconds
+                            now = float(v)/1000.0
                             data["metric_name:net.latency"] = time.time()-now
-                        elif k == "session": # Get Session, save as dim, and try get the related source
+                            
+                        elif k == "session": # Get Session, save as dimension, and try get the related source
                             session = k
                             source = sources.get(k,"unknown")
                         elif k == "profileName": # Set source, and if possible relate it to a session
