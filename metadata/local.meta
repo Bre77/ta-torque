@@ -16,3 +16,11 @@ modtime = 1574364780.569169000
 [inputs/torque%3A%2F%2Ftest]
 version = 8.0.0
 modtime = 1575007412.607434000
+
+[inputs/torque%3A%2F%2Fpython3]
+version = 8.0.0
+modtime = 1575190970.279581000
+
+[inputs/torque%3A%2F%2Fpython2]
+version = 8.0.0
+modtime = 1575192915.704019000
