@@ -208,7 +208,8 @@ def run_script():
                         self._set_headers(200)
                         self.wfile.write("OK!".encode("utf8")) # Torque requires this exact payload
                         return
-                    else:  
+
+                    else: # No valid timestamp or data, so this event is bogus  
                         logging.error("time={} query={}".format(now, query))
                         self._set_headers(422)
                         self.wfile.write("CANT PARSE".encode("utf8"))
