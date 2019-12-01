@@ -159,7 +159,7 @@ def run_script():
                         if k[:1] == "k":
                             ki = int(k[1:],16)
                             #do dict on id and add metric_name
-                            data["metric_name:car.{}".format(pids.get(k,"pid"+hex(k)[2:])] = float(v)
+                            data["metric_name:car.{}".format(pids.get(k,"pid"+hex(k)[2:]))] = float(v)
                         elif k == "eml":
                             if opt_email and v not in opt_email.split(","):
                                 logging.info(opt_email)
