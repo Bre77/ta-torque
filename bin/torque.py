@@ -183,7 +183,7 @@ def run_script():
                             if session:
                                 sources[session] = v
                             
-                        elif k[:13] == "userShortName": #Add missing defintions
+                        elif k[:13] == "userShortName": # Add missing defintions
                             ki = int(k[13:],16)
                             if ki not in pids:
                                 pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
