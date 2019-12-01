@@ -231,8 +231,6 @@ def run_script():
     logging.info("Listening on {}:{} in {} metric mode".format(opt_ip,opt_port,["single","multi"][opt_multimetric]))
     httpd.serve_forever()
 
-        
-
 # Script must implement these args: scheme, validate-arguments
 if __name__ == '__main__':
     if len(sys.argv) > 1:
