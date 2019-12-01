@@ -188,6 +188,7 @@ def run_script():
                             if ki not in pids:
                                 pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
                                 logging.info("Adding non standard PID {} = {}".format(ki,pids[ki]))
+                            
                         elif k[:4] == "user" or k[:4] == "defa" or k[:4] == "prof": #ignore
                             pass
                         else: #dimension
