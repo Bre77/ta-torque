@@ -194,19 +194,19 @@ def run_script():
                         
                         else: # Add the rest as dimensions
                             dims[k] = v
-                    
+
                     if now and data:
-                        if(opt_multimetric):
+                        if(opt_multimetric): # Send the entire payload as a single event, joining data and dimensions
                             print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(now,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
                         else:
-                            print("<stream>")
+                            print("<stream>") # Send the payload as seperate events, joining a single metric with all dimensions
                             for key,value in data.items():
                                 payload = dims.copy()
                                 payload[key] = value
                                 print("<event><time>{}</time><host>{}</host><source>{}</source><data>{}</data></event>".format(now,host,source,json.dumps(payload)))
                             print("</stream>")
                         self._set_headers(200)
-                        self.wfile.write("OK!".encode("utf8"))
+                        self.wfile.write("OK!".encode("utf8")) # Torque requires this exact payload
                         return
                     else:  
                         logging.error("time={} query={}".format(now, query))
