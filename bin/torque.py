@@ -169,7 +169,7 @@ def run_script():
                         elif k == "time":
                             now = float(v)/1000.0 #ms to s as float
                             data["metric_name:net.latency"] = time.time()-now
-                        elif k == "session": # Get Session, save as dim, and try get the connected source
+                        elif k == "session": # Get Session, save as dim, and try get the related source
                             session = k
                             dims["source"] = sources.get(k,"unknown")
                         elif k == "profileName":
