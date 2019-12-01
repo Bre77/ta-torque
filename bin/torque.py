@@ -169,6 +169,7 @@ def run_script():
                             now = float(v)/1000.0 #ms to s as float
                             data["metric_name:net.latency"] = time.time()-now
                         elif k[:13] == "userShortName": #Add missing defintions
+                        elif k[:13] == "userShortName": #Add missing defintions
                             ki = k[13:]
                             if ki not in pids:
                                 pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
@@ -176,16 +177,16 @@ def run_script():
                         elif k[:4] == "user" or k[:4] == "defa" or k[:4] == "prof": #ignore
                             pass
                         else: #dimension
-                            if opt_multimetric:
-                                data[k] = v
-                            else:
-                                dims[k] = v
+                            #if opt_multimetric:
+                            #    data[k] = v
+                            #else:
+                            dims[k] = v
                 
                     #"GET ?eml=brett.whynot@gmail.com&v=8&session=1574906194609&id=0f607264fc6318a92b9e13c65db7cd3c&time=1574906292241&kff1005=153.05600033&kff1006=-27.35587294&kff1001=0.0&kff1007=0.0&kff1239=11.583717&kff1010=51.9071044921875&kff123b=0.0&kff1006=-27.35587294&kff1005=153.05600033&kff1001=0.0
                 
                     if now and data:
                         if(opt_multimetric):
-                            print("<stream><event><time>{}</time><host>{}</host><source>Torque</source><data>{}</data></event></stream>".format(now,host,json.dumps(data)))
+                            print("<stream><event><time>{}</time><host>{}</host><source>Torque</source><data>{},{}</data></event></stream>".format(now,host,json.dumps(data)[:-1],json.dumps(dims)[1:]))
                         else:
                             print("<stream>")
                             for key,value in data.items():
