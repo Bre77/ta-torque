@@ -176,13 +176,12 @@ def run_script():
 
                         elif k == "session": # Get Session, save as dimension, and try get the related source
                             dims[session] = v
-                            session = v
                             source = sources.get(v,"unknown")
 
                         elif k == "profileName": # Set source, and if possible relate it to a session
                             source = v
-                            if session:
-                                sources[session] = v
+                            if dims[session]:
+                                sources[dims[session]] = v
                             
                         elif k[:13] == "userShortName": # Add missing defintions
                             ki = int(k[13:],16)
