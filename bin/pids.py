@@ -1,4 +1,4 @@
-pids = {
+oldpids = {
     "10":"Air.FlowRate",
     "11":"Throttle",
     "12":"Air.Status",
@@ -144,7 +144,7 @@ pids = {
     "ff5203":"L/100K.LongTermAverage"
 }
 
-newpids = {
+pids = {
     3:"Fuel.Status",
     4:"Engine.Load",
     5:"Engine.CoolantTemp",
