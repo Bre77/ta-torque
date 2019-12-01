@@ -148,7 +148,6 @@ def run_script():
         def do_GET(self):
             try:
                 if(self.path[:1] == "?"):
-                    session = None
                     source = "unknown"
                     host = self.client_address[0]
                     data = {}
