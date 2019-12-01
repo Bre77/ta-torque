@@ -157,6 +157,7 @@ def run_script():
                     for kv in query:
                         k,v = kv.split("=")
                         if k[:1] == "k":
+                            ki = int(k[1:],16
                             #do dict on id and add metric_name
                             data["metric_name:car.{}".format(pids.get(k,k))] = float(v)
                         elif k == "eml":
