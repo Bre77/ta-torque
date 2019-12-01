@@ -161,10 +161,9 @@ def run_script():
                         if k[:1] == "k":
                             ki = int(k[1:],16) # Get the PID Hex as Integer
                             data["metric_name:car.{}".format(pids.get(ki,hex(ki)))] = float(v) # Key as friendly name or Hex, and value as float
-                        elif k == "eml":
-                            if opt_email and v not in opt_email.split(","):
-                                logging.info(opt_email)
-                                logging.info("{}!=={}".format(opt_email,v))
+                        elif k == "eml": 
+                            if opt_email and v not in opt_email.split(","): # Check email matches, like a password
+                                logging.debug("{}!=={}".format(opt_email,v))
                                 self._set_headers(400)
                                 self.wfile.write("BAD EMAIL ADDRESS".encode("utf8"))
                                 return
