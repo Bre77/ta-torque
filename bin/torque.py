@@ -173,10 +173,11 @@ def run_script():
                         elif k == "time": # Get event time as seconds
                             now = float(v)/1000.0
                             data["metric_name:net.latency"] = time.time()-now
-                            
+
                         elif k == "session": # Get Session, save as dimension, and try get the related source
                             session = k
                             source = sources.get(k,"unknown")
+                            
                         elif k == "profileName": # Set source, and if possible relate it to a session
                             source = v
                             if session:
