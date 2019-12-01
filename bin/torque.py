@@ -214,12 +214,13 @@ def run_script():
                         self._set_headers(422)
                         self.wfile.write("CANT PARSE".encode("utf8"))
                         return
-                else:
+                    
+                else: # URL parameters are missing
                     self._set_headers(422)
                     self.wfile.write("NO DATA".encode("utf8"))
                     return
 
-            except Exception as e:
+            except Exception as e: # Dont crash, but throw a 500
                 logging.error(e)
                 logging.error(traceback.format_exc())
                 self._set_headers(500)
