@@ -177,11 +177,12 @@ def run_script():
                         elif k == "session": # Get Session, save as dimension, and try get the related source
                             session = k
                             source = sources.get(k,"unknown")
-                            
+
                         elif k == "profileName": # Set source, and if possible relate it to a session
                             source = v
                             if session:
                                 sources[session] = v
+                            
                         elif k[:13] == "userShortName": #Add missing defintions
                             ki = int(k[13:],16)
                             if ki not in pids:
