@@ -172,7 +172,7 @@ def run_script():
                         elif k == "session": # Get Session, save as dim, and try get the related source
                             session = k
                             dims["source"] = sources.get(k,"unknown")
-                        elif k == "profileName":
+                        elif k == "profileName": # Set source, and if possible relate it to a session
                             dims["source"] = v
                             if session:
                                 sources[session] = v
