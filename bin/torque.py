@@ -169,8 +169,13 @@ def run_script():
                         elif k == "time":
                             now = float(v)/1000.0 #ms to s as float
                             data["metric_name:net.latency"] = time.time()-now
-                        elif k[:11] == "profileName":
+                        elif k == "session": # Get Session, save as dim, and try get the connected source
+                            session = k
+                            dims["source"] = sources.get(k,"unknown")
+                        elif k == "profileName":
                             dims["source"] = v
+                            if session:
+                                sources[session] = v
                         elif k[:13] == "userShortName": #Add missing defintions
                             ki = k[13:]
                             if ki not in pids:
@@ -183,7 +188,6 @@ def run_script():
                             #    data[k] = v
                             #else:
                             dims[k] = v
-                            if()
                 
                     #"GET ?eml=brett.whynot@gmail.com&v=8&session=1574906194609&id=0f607264fc6318a92b9e13c65db7cd3c&time=1574906292241&kff1005=153.05600033&kff1006=-27.35587294&kff1001=0.0&kff1007=0.0&kff1239=11.583717&kff1010=51.9071044921875&kff123b=0.0&kff1006=-27.35587294&kff1005=153.05600033&kff1001=0.0
                 
