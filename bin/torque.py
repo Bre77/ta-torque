@@ -128,7 +128,7 @@ def run_script():
     opt_port=int(config["port"])
     opt_email=config.get("email",None)
 
-
+    sources = {}
 
     class S(BaseHTTPRequestHandler):
         def _set_headers(self,code):
@@ -148,6 +148,7 @@ def run_script():
         def do_GET(self):
             try:
                 if(self.path[:1] == "?"):
+                    session = None
                     host = self.client_address[0]
                     data = {}
                     dims = {}
@@ -168,7 +169,8 @@ def run_script():
                         elif k == "time":
                             now = float(v)/1000.0 #ms to s as float
                             data["metric_name:net.latency"] = time.time()-now
-                        elif k[:13] == "userShortName": #Add missing defintions
+                        elif k[:11] == "profileName":
+                            dims["source"] = v
                         elif k[:13] == "userShortName": #Add missing defintions
                             ki = k[13:]
                             if ki not in pids:
@@ -181,6 +183,7 @@ def run_script():
                             #    data[k] = v
                             #else:
                             dims[k] = v
+                            if()
                 
                     #"GET ?eml=brett.whynot@gmail.com&v=8&session=1574906194609&id=0f607264fc6318a92b9e13c65db7cd3c&time=1574906292241&kff1005=153.05600033&kff1006=-27.35587294&kff1001=0.0&kff1007=0.0&kff1239=11.583717&kff1010=51.9071044921875&kff123b=0.0&kff1006=-27.35587294&kff1005=153.05600033&kff1001=0.0
                 
