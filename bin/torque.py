@@ -189,12 +189,10 @@ def run_script():
                                 pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
                                 logging.info("Adding non standard PID {} = {}".format(ki,pids[ki]))
                             
-                        elif k[:4] == "user" or k[:4] == "defa" or k[:4] == "prof": #ignore
+                        elif k[:4] == "user" or k[:4] == "defa" or k[:4] == "prof": # Ignore these keys
                             pass
-                        else: #dimension
-                            #if opt_multimetric:
-                            #    data[k] = v
-                            #else:
+                        
+                        else: # Add the rest as dimensions
                             dims[k] = v
                 
                     #"GET ?eml=brett.whynot@gmail.com&v=8&session=1574906194609&id=0f607264fc6318a92b9e13c65db7cd3c&time=1574906292241&kff1005=153.05600033&kff1006=-27.35587294&kff1001=0.0&kff1007=0.0&kff1239=11.583717&kff1010=51.9071044921875&kff123b=0.0&kff1006=-27.35587294&kff1005=153.05600033&kff1001=0.0
