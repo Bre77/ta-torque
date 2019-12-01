@@ -195,13 +195,13 @@ def run_script():
                 
                     if now and data:
                         if(opt_multimetric):
-                            print("<stream><event><time>{}</time><host>{}</host><source>Torque</source><data>{},{}</data></event></stream>".format(now,host,json.dumps(data)[:-1],json.dumps(dims)[1:]))
+                            print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(now,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
                         else:
                             print("<stream>")
                             for key,value in data.items():
                                 payload = dims.copy()
                                 payload[key] = value
-                                print("<event><time>{}</time><host>{}</host><source>Torque</source><data>{}</data></event>".format(now,host,json.dumps(payload)))
+                                print("<event><time>{}</time><host>{}</host><source>{}</source><data>{}</data></event>".format(now,host,source,json.dumps(payload)))
                             print("</stream>")
                         self._set_headers(200)
                         self.wfile.write("OK!".encode("utf8"))
