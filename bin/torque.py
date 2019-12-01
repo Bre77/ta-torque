@@ -170,7 +170,9 @@ def run_script():
                             data["metric_name:net.latency"] = time.time()-now
                         elif k[:13] == "userShortName": #Add missing defintions
                             ki = k[13:]
-                            pids[ki] = pids.get(ki,unquote(v).replace(" ",".").replace("+","."))
+                            if ki not in pids:
+                                pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
+                                logging.info("Adding non standard PID {}".format(pids[ki]))
                         elif k[:4] == "user" or k[:4] == "defa": #ignore
                             pass
                         else: #dimension
