@@ -174,13 +174,13 @@ def run_script():
                             data["metric_name:net.latency"] = time.time()-now
 
                         elif k == "session": # Get Session, save as dimension, and try get the related source
-                            dims[session] = v
+                            dims["session"] = v
                             source = sources.get(v,"unknown")
 
                         elif k == "profileName": # Set source, and if possible relate it to a session
                             source = v
-                            if dims[session] in dims:
-                                sources[dims[session]] = v
+                            if dims["session"] in dims:
+                                sources[dims["session"]] = v
                             
                         elif k[:13] == "userShortName": # Add missing defintions
                             ki = int(k[13:],16)
