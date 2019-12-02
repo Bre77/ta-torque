@@ -33,3 +33,7 @@ export = system
 [viewstates]
 access = read : [ * ], write : [ * ]
 export = system
+
+[macros]
+access = read : [ * ], write : [ admin ]
+export = none
