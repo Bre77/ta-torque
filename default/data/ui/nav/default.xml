@@ -1,5 +1,5 @@
 <nav search_view="search">
   <view name="torque_summary" default='true' />
-  <view name="search" />
+  <view name="analytics_workspace" />
   <view name="dashboards" />
 </nav>
