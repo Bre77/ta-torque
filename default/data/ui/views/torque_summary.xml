@@ -10,7 +10,7 @@
       <table>
         <title>Sessions</title>
         <search>
-          <query>| mstats max(car.Runtime) as "Duration" avg(car.Speed.OBD) as "Avg Speed" max(car.Speed.GPS) as "Max Speed" by session 
+          <query>| mstats max(car.Runtime) as "Duration" avg(car.Speed.OBD) as "Avg Speed" max(car.Speed.GPS) as "Max Speed" max(car.Trip.Distance) as "Distance" max(car.Trip.FuelUsed) as "Fuel" where `torque-index` by session 
 | where Duration&gt;0 
 | eval _time = session/1000, end = _time+Duration, Duration = Duration/60 
 | sort -_time
@@ -26,9 +26,15 @@
         <option name="rowNumbers">false</option>
         <option name="totalsRow">false</option>
         <option name="wrap">true</option>
+        <format type="number" field="Avg Speed"></format>
         <format type="number" field="Duration">
           <option name="precision">0</option>
           <option name="unit">min</option>
+        </format>
+        <format type="number" field="Max Speed"></format>
+        <format type="number" field="Distance">
+          <option name="precision">1</option>
+          <option name="unit">KM</option>
         </format>
         <format type="number" field="Duration">
           <option name="precision">0</option>
@@ -40,7 +46,15 @@
           <option name="unit">min</option>
         </format>
         <format type="number" field="Max Speed"></format>
-        <fields>["_time","reltime","Duration","Avg Speed","Max Speed"]</fields>
+        <format type="number" field="Distance">
+          <option name="precision">1</option>
+          <option name="unit">KM</option>
+        </format>
+        <format type="number" field="Fuel">
+          <option name="precision">1</option>
+          <option name="unit">L</option>
+        </format>
+        <fields>["_time","reltime","Duration","Avg Speed","Max Speed","Distance","Fuel"]</fields>
         <drilldown>
           <set token="start">$row._time$</set>
           <set token="end">$row.end$</set>
@@ -53,7 +67,7 @@
     <panel>
       <chart>
         <search>
-          <query>|mstats avg(car.Speed.OBD) as OBD avg(car.Speed.GPS) as GPS where index=telemetry session=$session$ span=10s</query>
+          <query>|mstats avg(car.Engine.RPM) as RPM avg(car.Speed.OBD) as Speed where `torque-index` session=$session$ span=5s</query>
           <earliest>$start$</earliest>
           <latest>$end$</latest>
           <sampleRatio>1</sampleRatio>
@@ -63,14 +77,16 @@
         <option name="charting.axisTitleX.visibility">collapsed</option>
         <option name="charting.axisTitleY.text">KM/H</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisY2.enabled">1</option>
         <option name="charting.chart">line</option>
         <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">RPM</option>
         <option name="charting.drilldown">none</option>
         <option name="refresh.display">progressbar</option>
       </chart>
       <chart>
         <search>
-          <query>|mstats avg(car.Voltage.ECU) as ECU avg(car.Voltage.OBDAdapter) as OBD where index=telemetry session=$session$ span=10s</query>
+          <query>|mstats avg(car.Voltage.ECU) as ECU avg(car.Voltage.OBDAdapter) as OBD where `torque-index` session=$session$ span=5s</query>
           <earliest>$start$</earliest>
           <latest>$end$</latest>
           <sampleRatio>1</sampleRatio>
@@ -88,7 +104,7 @@
       </chart>
       <chart>
         <search>
-          <query>|mstats avg(net.latency) as latency where index=telemetry session=$session$ span=10s</query>
+          <query>|mstats avg(car.Engine.Load) as Load where `torque-index` session=$session$ span=5s</query>
           <earliest>$start$</earliest>
           <latest>$end$</latest>
           <sampleRatio>1</sampleRatio>
@@ -96,10 +112,11 @@
           <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.axisTitleY.text">%</option>
         <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisY.maximumNumber">16</option>
-        <option name="charting.chart">line</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">area</option>
         <option name="charting.chart.nullValueMode">gaps</option>
         <option name="charting.drilldown">none</option>
         <option name="refresh.display">progressbar</option>
@@ -108,7 +125,7 @@
     <panel>
       <viz type="location_tracker_app.location_tracker">
         <search>
-          <query>| mstats avg(car.Latitude) as latitude avg(car.Longitude) as longitude where index=telemetry session=$session$ span=10s 
+          <query>| mstats avg(car.Latitude) as latitude avg(car.Longitude) as longitude where `torque-index` session=$session$ span=10s 
 | sort -_time 
 | table _time latitude longitude session</query>
           <earliest>$start$</earliest>
