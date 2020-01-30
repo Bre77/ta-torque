@@ -11,12 +11,12 @@ version = 8.0.0
 modtime = 1575007412.607434000
 
 [inputs/torque%3A%2F%2Fpython3]
-version = 8.0.0
-modtime = 1575239648.455560000
+version = 8.0.1
+modtime = 1578120423.289372000
 
 [inputs/torque%3A%2F%2Fpython2]
-version = 8.0.0
-modtime = 1575239651.508810000
+version = 8.0.1
+modtime = 1578255375.811912000
 
 [views/overview]
 owner = brett
@@ -26,14 +26,15 @@ modtime = 1575239783.297432000
 [macros/torque-index]
 access = read : [ * ], write : [ admin ]
 export = none
-owner = brett
-version = 8.0.0
-modtime = 1575239919.068268000
+owner = admin
+version = 8.0.1
+modtime = 1580187616.824118000
 
 [views/torque_summary]
-owner = brett
-version = 8.0.0
-modtime = 1575240309.816582000
+export = none
+owner = admin
+version = 8.0.1
+modtime = 1580184134.813171000
 
 [nav/default]
 version = 8.0.0

@@ -38,9 +38,9 @@ SCHEME = """<scheme>
 
             <arg name="port">
                 <title>Port</title>
-                <description>The UDP port to listen on</description>
+                <description>The TCP port to listen on</description>
                 <data_type>number</data_type>
-                <validation>is_avail_udp_port('port')</validation>
+                <validation>is_avail_tcp_port('port')</validation>
             </arg>
 
             <arg name="bindip">
@@ -131,24 +131,30 @@ def run_script():
     sources = {}
 
     class S(BaseHTTPRequestHandler):
+        def setup(self):
+            BaseHTTPRequestHandler.setup(self)
+            self.request.settimeout(1)
+
         def _set_headers(self,code):
             self.send_response(code)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            
+        
+        def log_message(self, format, *args):
+            return
+
         def do_POST(self):
             self._set_headers(405)
 
         def do_HEAD(self):
             self._set_headers(200)
 
-        def log_message(self, format, *args):
-            logging.debug(' '.join(map(str,args)))
+        #def log_message(self, format, *args):
+        #    logging.debug(' '.join(map(lambda s: unicode(s, errors='replace'),args)))
 
         def do_GET(self):
             try:
                 if(self.path[:1] == "?"):
-                    source = "unknown"
                     host = self.client_address[0]
                     data = {}
                     dims = {}
@@ -175,11 +181,9 @@ def run_script():
 
                         elif k == "session": # Get Session, save as dimension, and try get the related source
                             dims["session"] = v
-                            source = sources.get(v,"unknown")
 
                         elif k == "profileName": # Set source, and if possible relate it to a session
-                            source = v
-                            if dims["session"] in dims:
+                            if "session" in dims:
                                 sources[dims["session"]] = v
                             
                         elif k[:13] == "userShortName": # Add missing defintions
@@ -195,6 +199,7 @@ def run_script():
                             dims[k] = v
 
                     if now and data:
+                        source = sources.get(dims["session"],"unknown")
                         if(opt_multimetric): # Send the entire payload as a single event, joining data and dimensions
                             print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(now,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
                         else:
@@ -221,9 +226,8 @@ def run_script():
 
             except Exception as e: # Dont crash, but throw a 500
                 logging.error(e)
-                logging.error(traceback.format_exc())
                 self._set_headers(500)
-                self.wfile.write("SCRIPT ERROR".encode("utf8"))
+                self.wfile.write("SERVER ERROR".encode("utf8"))
                 return
     
     httpd = HTTPServer((opt_ip,opt_port), S)
