@@ -11,7 +11,7 @@
       <table>
         <title>Sessions</title>
         <search>
-          <query>| mstats count(net.latency) as count avg(car.Speed.OBD) as "Avg Speed" max(car.Speed.GPS) as "Max Speed" max(car.Trip.Distance) as "Distance" max(car.Trip.FuelUsed) as "Fuel" where `torque-index` by id session source 
+          <query>| mstats count(net.latency) as count avg(car.Speed.OBD) as "Avg Speed" max(car.Speed.GPS) as "Max Speed" max(car.Trip.Distance) as "Distance" max(car.Trip.FuelUsed) as "Fuel" where `torque-index` by id session 
 | where count&gt;24
 | join id session [| mstats count(net.latency) where `torque-index` by id session span=1s | stats min(_time) as start, max(_time) as end by id session]
 | eval _time=end, Interval=(end-start)/count, Duration = (end-start)/60 
@@ -62,7 +62,7 @@
           <option name="unit">sec</option>
           <option name="useThousandSeparators">false</option>
         </format>
-        <fields>["_time","reltime","source","Duration","Avg Speed","Max Speed","Distance","Fuel","Interval"]</fields>
+        <fields>["_time","reltime","Duration","Avg Speed","Max Speed","Distance","Fuel","Interval"]</fields>
         <drilldown>
           <set token="start">$row.start$</set>
           <set token="end">$row.end$</set>

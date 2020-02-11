@@ -8,9 +8,9 @@ import json
 import logging
 import traceback
 try:
-    from urllib.parse import unquote
+    from urllib.parse import unquote,parse_qs
 except ImportError:
-    from urlparse import unquote
+    from urlparse import unquote,parse_qs
 
 from pids import pids
 
@@ -155,14 +155,16 @@ def run_script():
         def do_GET(self):
             try:
                 if(self.path[:1] == "?"):
+                    query = parse_qs(self.path[1:]) #query = self.path[1:].split("&")
                     host = self.client_address[0]
                     data = {}
                     dims = {}
                     now = time.time()
-                    query = self.path[1:].split("&")
-
-                    for kv in query: # Iterate through the query string
-                        k,v = kv.split("=") # Get the key and value
+                    timestamp = None
+                    profileName = None
+                    
+                    for k in query: # Iterate through the query string
+                        v = query[k][0]
 
                         if k[:1] == "k": # Get the PID Hex as Integer, look up its name, and store it
                             ki = int(k[1:],16)
@@ -176,20 +178,19 @@ def run_script():
                                 return
 
                         elif k == "time": # Get event time as seconds
-                            now = float(v)/1000.0
-                            data["metric_name:net.latency"] = time.time()-now
+                            timestamp = float(v)/1000.0
+                            data["metric_name:net.latency"] = now-timestamp
 
-                        elif k == "session": # Get Session, save as dimension, and try get the related source
+                        elif k == "session": # Get Session, save as dimension
                             dims["session"] = v
 
-                        elif k == "profileName": # Set source, and if possible relate it to a session
-                            if "session" in dims:
-                                sources[dims["session"]] = v
+                        elif k == "profileName": # Update source
+                            sources[query["id"][0]] = v
                             
                         elif k[:13] == "userShortName": # Add missing defintions
                             ki = int(k[13:],16)
                             if ki not in pids:
-                                pids[ki] = "ext.{}".format(unquote(v).replace(" ",".").replace("+","."))
+                                pids[ki] = "ext.{}".format(v.replace(" ",".").replace("+","."))
                                 logging.info("Adding non standard PID {} = {}".format(ki,pids[ki]))
                             
                         elif k[:4] == "user" or k[:4] == "defa" or k[:4] == "prof": # Ignore these keys
@@ -198,16 +199,16 @@ def run_script():
                         else: # Add the rest as dimensions
                             dims[k] = v
 
-                    if now and data:
-                        source = sources.get(dims["session"],"unknown")
+                    if timestamp and data:
+                        source = sources.get(query["id"][0],"unknown")
                         if(opt_multimetric): # Send the entire payload as a single event, joining data and dimensions
-                            print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(now,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
+                            print("<stream><event><time>{}</time><host>{}</host><source>{}</source><data>{},{}</data></event></stream>".format(timestamp,host,source,json.dumps(data)[:-1],json.dumps(dims)[1:]))
                         else:
                             print("<stream>") # Send the payload as seperate events, joining a single metric with all dimensions
                             for key,value in data.items():
                                 payload = dims.copy()
                                 payload[key] = value
-                                print("<event><time>{}</time><host>{}</host><source>{}</source><data>{}</data></event>".format(now,host,source,json.dumps(payload)))
+                                print("<event><time>{}</time><host>{}</host><source>{}</source><data>{}</data></event>".format(timestamp,host,source,json.dumps(payload)))
                             print("</stream>")
                         self._set_headers(200)
                         self.wfile.write("OK!".encode("utf8")) # Torque requires this exact payload
