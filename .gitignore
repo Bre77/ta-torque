@@ -1,5 +1,6 @@
-__pycache__/
-*.py[cod]
-*$py.class
-
 local/
+local.meta
+__pycache__
+*.pyc
+lib/*
+!lib/requirements.txt
